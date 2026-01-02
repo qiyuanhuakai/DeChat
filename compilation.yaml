@@ -1,0 +1,29 @@
+name: dechat_compilation
+channels:
+  - conda-forge
+channel_priority: flexible
+dependencies:
+  - python
+  - boost>=1.67
+  - boost<1.73
+  - boost-cpp>=1.67
+  - boost-cpp<1.73
+  - protobuf
+  - libprotobuf
+  - zlib
+  - bzip2
+  - jemalloc
+  - sdsl-lite
+  - sparsehash
+  - numpy
+  - make
+  - pkg-config
+  - compilers
+  - cmake>=3.20
+  - pip
+  - Ninja
+  - gcc>=11
+  - gcc<14
+  - gxx>=11
+  - gxx<14
+  - simde
