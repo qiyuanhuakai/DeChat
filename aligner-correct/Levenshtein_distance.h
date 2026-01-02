@@ -3,10 +3,8 @@
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
-#include "emmintrin.h"
-#include "nmmintrin.h"
-#include "smmintrin.h"
-#include <immintrin.h>
+#define SIMDE_ENABLE_NATIVE_ALIASES
+#include <simde/x86/sse4.1.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>

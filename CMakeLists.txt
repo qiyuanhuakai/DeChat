@@ -2,11 +2,33 @@ project(dechat)
 
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_CXX_STANDARD 17)
+
+#...............................................................................................................#
+
+# 检测是否为 ARM 架构 (aarch64 或 arm64)
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+    message(STATUS "Detected ARM architecture (Apple Silicon/Linux aarch64). Configuring for SIMDe.")
+    
+    # 1. 开启 ARM 本地优化 (替代 x86 的 -mfma 等特定指令)
+    add_compile_options(-march=native)
+    
+    # 2. 全局定义 SIMDe 别名宏，确保所有文件都能自动映射 SSE 到 NEON
+    add_definitions(-DSIMDE_ENABLE_NATIVE_ALIASES)
+else()
+    # 如果还是在 x86 机器上编译，保留原有优化
+    message(STATUS "Detected x86 architecture.")
+    add_compile_options(-mfma -msse4.1) 
+endif()
+
+if(DEFINED ENV{CONDA_PREFIX})
+    include_directories($ENV{CONDA_PREFIX}/include)
+    message(STATUS "Added Conda include path: $ENV{CONDA_PREFIX}/include")
+else()
+    message(WARNING "CONDA_PREFIX not found. Make sure Conda environment is activated.")
+endif()
 #...............................................................................................................#
 
 SET (GATB_CORE_HOME  ${PROJECT_SOURCE_DIR}/gatb-core)
-
-add_compile_options(-mfma)
 
 set(HIFIASM_PATH ${PROJECT_SOURCE_DIR}/aligner-correct)
 message(${PROJECT_SOURCE_DIR}/aligner-correct)
@@ -17,13 +39,9 @@ include_directories(${HIFIASM_PATH})
 
 find_package(Threads REQUIRED)
 
-
-
 # find_package(Protobuf REQUIRED)
 
 find_package(ZLIB REQUIRED)
-
-
 
 # include_directories(${Protobuf_INCLUDE_DIRS})
 
