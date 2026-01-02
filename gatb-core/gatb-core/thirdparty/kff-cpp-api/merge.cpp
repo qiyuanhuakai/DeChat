@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <cstdint>
 
 #include "kff_io.hpp"
 #include "merge.hpp"
