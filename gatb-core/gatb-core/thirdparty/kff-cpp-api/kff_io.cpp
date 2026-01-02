@@ -3,7 +3,7 @@
 #include <cstring>
 #include <sstream>
 #include <math.h>
-
+#include <cstdint>
 #include <map>
 #include <vector>
 
