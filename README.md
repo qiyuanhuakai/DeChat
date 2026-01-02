@@ -12,7 +12,7 @@
 This repository is an unofficial fork of LuoGroup2023/DeChat and includes fixes/improvements (e.g. `-t` thread handling in `correct_round1`). 
 
 我在本 fork 中引入了 **SIMDe** 兼容层，使 DeChat 能够在 **aarch64 Linux** 设备上完成编译并运行。但由于缺乏足够的样本验证，我**无法保证**在 aarch64 平台上的运行结果与其他平台完全一致或其结果准确性。\
-I introduced **SIMDe** compatibility in this fork so that DeChat can be built and run on **aarch64 Linux** devices.However, due to limited samples, I **cannot guarantee** that results on aarch64 are fully identical to those on other platforms or that the output accuracy is fully verified.
+I introduced **SIMDe** compatibility in this fork so that DeChat can be built and run on **aarch64 Linux** devices.However, due tgio limited samples, I **cannot guarantee** that results on aarch64 are fully identical to those on other platforms or that the output accuracy is fully verified.
 
 此外，我对本 fork 的可用构建依赖版本范围进行了验证；请以 `compilation.yaml` 中记录的依赖与版本约束为准。\
 In addition, I validated the workable dependency/version range for building this fork; please refer to `compilation.yaml` for the authoritative dependency list and version constraints.
