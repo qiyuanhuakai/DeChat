@@ -8,14 +8,25 @@
 ![Stars](https://img.shields.io/github/stars/LuoGroup2023/DeChat?style=social)
 
 ## Fork notice / 分叉说明
-本仓库为 LuoGroup2023/DeChat 的非官方 fork，包含若干构建与运行相关修复（例如 `-t` 线程参数在 `correct_round1` 阶段的生效问题）。\
-This repository is an unofficial fork of LuoGroup2023/DeChat and includes fixes/improvements (e.g. `-t` thread handling in `correct_round1`). 
 
-我在本 fork 中引入了 **SIMDe** 兼容层，使 DeChat 能够在 **aarch64 Linux** 设备上完成编译并运行。但由于缺乏足够的样本验证，我**无法保证**在 aarch64 平台上的运行结果与其他平台完全一致或其结果准确性。\
-I introduced **SIMDe** compatibility in this fork so that DeChat can be built and run on **aarch64 Linux** devices.However, due to limited samples, I **cannot guarantee** that results on aarch64 are fully identical to those on other platforms or that the output accuracy is fully verified.
+本仓库为 LuoGroup2023/DeChat 的非官方分叉，包含若干构建与运行相关修复与改进。
+This repository is an unofficial fork of LuoGroup2023/DeChat and includes fixes/improvements related to build and runtime behavior.
 
-此外，我对本 fork 的可用构建依赖版本范围进行了验证；请以 `compilation.yaml` 中记录的依赖与版本约束为准。\
-In addition, I validated the workable dependency/version range for building this fork; please refer to `compilation.yaml` for the authoritative dependency list and version constraints.
+上游版本存在一个已知问题：当用户通过 -t 指定线程数时，correct_round1 阶段可能不会遵循该设置，而是占用全部可用 CPU 核心。相关修复已作为 PR 提交至上游，但目前尚未被合并:https://github.com/LuoGroup2023/DeChat/pull/13
+\
+The upstream version has a known issue: when users specify -t, the correct_round1 stage may ignore this setting and use all available CPU cores. A fix has been submitted upstream but has not been merged yet:https://github.com/LuoGroup2023/DeChat/pull/13
+
+我通过修改使用的第三方库，向 merge.cpp 和 kff_io.cpp 中添加 `#include <cstdint>`，使该项目能够支持 gcc13/g++13 编译。\
+I adjusted the third-party library in use and added `#include <cstdint>` to merge.cpp and kff_io.cpp, enabling compilation with gcc 13 / g++ 13.
+
+我在本分叉中引入了 SIMDe 兼容层，使 DeChat 能够在 aarch64 Linux 设备上完成编译并运行。但由于缺乏足够的样本验证，我无法保证在 aarch64 平台上的运行结果与其他平台完全一致或其结果准确性。\
+I introduced SIMDe (SIMD everywhere) compatibility in this fork so that DeChat can be built and run on aarch64 Linux devices. However, due to limited samples, I cannot guarantee that results on aarch64 are fully identical to those on other platforms or that the output accuracy is fully verified.
+
+此外，我对本 fork 的可用构建依赖版本范围进行了验证；请以 compilation.yaml 中记录的依赖与版本约束为准。\
+In addition, I validated the workable dependency/version range for building this fork; please refer to compilation.yaml for the authoritative dependency list and version constraints.
+
+我已知该项目仍存在一个 bug：其最大只能使用 64 线程，但我暂时没时间修复。\
+I am aware of an existing bug that the project supports at most 64 threads, but I have not had time to fix it yet.
 ## Description
 
 Error correction is the canonical first step in long-read sequencing data analysis. Nanopore R10 reads have error rates below 2\%. we introduce DeChat, a novel approach specifically designed for Nanopore R10 reads.DeChat enables repeat- and haplotype-aware error correction, leveraging the strengths of both de Bruijn graphs and variant-aware multiple sequence alignment to create a synergistic approach. This approach avoids read overcorrection, ensuring that variants in repeats and haplotypes are preserved while sequencing errors are accurately corrected.
