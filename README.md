@@ -7,7 +7,15 @@
 ![Downloads](https://img.shields.io/github/downloads/LuoGroup2023/DeChat/total)
 ![Stars](https://img.shields.io/github/stars/LuoGroup2023/DeChat?style=social)
 
+## Fork notice / 分叉说明
+本仓库为 LuoGroup2023/DeChat 的非官方 fork，包含若干构建与运行相关修复（例如 `-t` 线程参数在 `correct_round1` 阶段的生效问题）。\
+This repository is an unofficial fork of LuoGroup2023/DeChat and includes fixes/improvements (e.g. `-t` thread handling in `correct_round1`). 
 
+我在本 fork 中引入了 **SIMDe** 兼容层，使 DeChat 能够在 **aarch64 Linux** 设备上完成编译并运行。但由于缺乏足够的样本验证，我**无法保证**在 aarch64 平台上的运行结果与其他平台完全一致或其结果准确性。\
+I introduced **SIMDe** compatibility in this fork so that DeChat can be built and run on **aarch64 Linux** devices.However, due to limited samples, I **cannot guarantee** that results on aarch64 are fully identical to those on other platforms or that the output accuracy is fully verified.
+
+此外，我对本 fork 的可用构建依赖版本范围进行了验证；请以 `compilation.yaml` 中记录的依赖与版本约束为准。\
+In addition, I validated the workable dependency/version range for building this fork; please refer to `compilation.yaml` for the authoritative dependency list and version constraints.
 ## Description
 
 Error correction is the canonical first step in long-read sequencing data analysis. Nanopore R10 reads have error rates below 2\%. we introduce DeChat, a novel approach specifically designed for Nanopore R10 reads.DeChat enables repeat- and haplotype-aware error correction, leveraging the strengths of both de Bruijn graphs and variant-aware multiple sequence alignment to create a synergistic approach. This approach avoids read overcorrection, ensuring that variants in repeats and haplotypes are preserved while sequencing errors are accurately corrected.
@@ -16,37 +24,80 @@ DeChat can use HIFi or NGS to correct ONT now
 
 Dechat is implemented with C++.
 
-## Installation and dependencies
-DeChat relies on the following dependencies:
-- gcc 9.5+ 
-- cmake 3.2+
-- zlib
-- boost 1.67
+## Installation and dependencies / 安装与依赖
 
-#### 1.Install from [Conda]() 
-This is easy and recommended:
-```
+可复现的构建依赖以 `compilation.yaml` 为准；此处仅列出关键依赖及已验证可用的版本范围。  
+For a reproducible build, please refer to `compilation.yaml`. The list below highlights the key dependencies and the tested version ranges.
+
+- GCC/GXX: **>= 9.5** and **< 14**  
+已知在 GXX 14 下无法通过编译，原因尚待进一步定位。 \
+Building with GXX 14 is known to fail; the root cause is still under investigation.
+- CMake: **>= 3.2** 
+- zlib
+- Boost: **>= 1.67** and **< 1.73**  
+已知在 Boost >= 1.73.0 下无法通过编译，原因尚待进一步定位。 \
+Building with Boost >= 1.73.0 is known to fail; the root cause is still under investigation.
+
+部分系统发行版的软件源可能不提供较旧的 Boost；因此建议使用 Conda 环境进行构建 \
+Some OS package managers may not ship older Boost versions; using a Conda environment is recommended.
+
+### 1) Install from Conda / 通过 Conda 安装
+
+> ⚠️ 说明（关于 Conda/Bioconda 包）/ Note (about Conda/Bioconda package)
+>
+> 上游版本存在一个已知问题：当用户通过 `-t` 指定线程数时，`correct_round1` 阶段可能不会遵循该设置，而是占用全部可用 CPU 核心。
+> 相关修复已作为 PR 提交至上游，但目前尚未被合并：
+> https://github.com/LuoGroup2023/DeChat/pull/13
+>
+> The upstream version has a known issue: when users specify `-t`, the `correct_round1`
+> stage may ignore this setting and use all available CPU cores.
+> A fix has been submitted upstream but has not been merged yet:
+> https://github.com/LuoGroup2023/DeChat/pull/13
+
+
+如果你仅希望快速试用，可尝试 Conda 安装（但不包含上述修复）：  
+If you only want a quick try, you may install via Conda (the fix above is not included):
+
+```bash
 conda create -n dechat
 conda activate dechat
 conda install -c bioconda dechat
 ```
-#### 2.Install from source code 
+#### 2) Install from source / 从源码安装（推荐） 
 ```bash
-git clone https://github.com/LuoGroup2023/DeChat.git
-conda create -n dechat boost=1.67.0
+git clone https://github.com/qiyuanhuakai/DeChat.git
+conda env create -n dechat --file compilation.yaml
 conda activate dechat
 ```
+或使用 mamba（解析依赖更快）：\
+Or use mamba (faster environment solving):
 
-## Running and options
-If you pulled the source repo; to run dechat 
 ```bash
-cd dechat
-mkdir build &&cd build
-cmake ..
-make -j 16
-cd ..
+git clone https://github.com/qiyuanhuakai/DeChat.git
+mamba create -n dechat -f compilation.yaml
+mamba activate dechat
+```
+## Build & Run / 编译与运行
+建议使用 Ninja 生成器进行构建，可略微提升编译速度。\
+Ninja is recommended for a slightly faster build.
+
+```bash
+cd DeChat
+rm -rf build 
+mkdir build
+cmake -S . -B build -G Ninja
+cmake --build build
 ./bin/dechat
 ```
+
+>**关于编译警告 / About warnings**
+>
+>编译过程中会出现极多 warning（尤其是使用 GCC 13 时）。如需减少，可考虑使用 GCC 11 或更低版本，或在配置时添加：\
+You may see many warnings during compilation (especially with GCC 13).To reduce them, consider using GCC 11 or older, or add the following CMake options:
+>
+>`-Wno-dev -DCMAKE_C_FLAGS="-w" -DCMAKE_CXX_FLAGS="-w"`
+
+
 
 The input read file is only required and the format should be FASTA/FASTQ (can be compressed with gzip). Other parameters are optional.
 Please run `dechat` to get details of optional arguments. 
@@ -82,7 +133,7 @@ dechat -i reads.fa.gz -o reads -t 8
 ### Using HIFi or NGS to correct ONT
 ```
 cd example
-dechat -i reads.fa.gz -o reads -t 8 -d HiFi-reads.fq.gz/NGS-reads.fq.g
+dechat -i reads.fa.gz -o reads -t 8 -d HiFi-reads.fq.gz/NGS-reads.fq.gz
 ```
 
 
