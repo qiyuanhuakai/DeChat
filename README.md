@@ -12,21 +12,21 @@
 本仓库为 LuoGroup2023/DeChat 的非官方分叉，包含若干构建与运行相关修复与改进。\
 This repository is an unofficial fork of LuoGroup2023/DeChat and includes fixes/improvements related to build and runtime behavior.
 
-上游版本存在一个已知问题：当用户通过 -t 指定线程数时，correct_round1 阶段可能不会遵循该设置，而是占用全部可用 CPU 核心。相关修复已作为 PR 提交至上游，但目前尚未被合并:https://github.com/LuoGroup2023/DeChat/pull/13
+- 上游版本存在一个已知问题：当用户通过 -t 指定线程数时，correct_round1 阶段可能不会遵循该设置，而是占用全部可用 CPU 核心。相关修复已作为 PR 提交至上游，但目前尚未被合并:https://github.com/LuoGroup2023/DeChat/pull/13
 \
 The upstream version has a known issue: when users specify -t, the correct_round1 stage may ignore this setting and use all available CPU cores. A fix has been submitted upstream but has not been merged yet:https://github.com/LuoGroup2023/DeChat/pull/13
 
-我在本分叉中修改了第三方库，向 merge.cpp 和 kff_io.cpp 中添加 `#include <cstdint>`，使该项目能够支持 gcc13/g++13 编译。\
+- 我在本分叉中修改了第三方库，向 merge.cpp 和 kff_io.cpp 中添加 `#include <cstdint>`，使该项目能够支持 gcc13/g++13 编译。\
 I adjusted the third-party library in this fork and added `#include <cstdint>` to merge.cpp and kff_io.cpp, enabling compilation with gcc 13 / g++ 13.
 
-我在本分叉中引入了 SIMDe 兼容层，使 DeChat 能够在 aarch64 Linux 设备上完成编译并运行。但由于缺乏足够的样本验证，我无法保证在 aarch64 平台上的运行结果与其他平台完全一致或其结果准确性。\
+- 我在本分叉中引入了 SIMDe 兼容层，使 DeChat 能够在 aarch64 Linux 设备上完成编译并运行。但由于缺乏足够的样本验证，我无法保证在 aarch64 平台上的运行结果与其他平台完全一致或其结果准确性。\
 I introduced SIMDe (SIMD everywhere) compatibility in this fork so that DeChat can be built and run on aarch64 Linux devices. However, due to limited samples, I cannot guarantee that results on aarch64 are fully identical to those on other platforms or that the output accuracy is fully verified.
 
-我对本分叉的可用构建依赖版本范围进行了验证；请以 compilation.yaml 中记录的依赖与版本约束为准。\
+- 我对本分叉的可用构建依赖版本范围进行了验证；请以 compilation.yaml 中记录的依赖与版本约束为准。\
 I validated the workable dependency/version range for building this fork; please refer to compilation.yaml for the authoritative dependency list and version constraints.
 
-我已知该项目仍存在一个 bug：其最大只能使用约 65 线程，但我没弄明白该怎么修复。\
-I am aware of an existing bug that the project supports around 65 threads at most, but I have not understood how to fix it yet.
+- 我已知 `-t` 参数存在一个特性：当输入文件过小时，它会主动减少创建的线程数。这属于 gatb-core 的设计行为，但仍可能导致程序未按你的预期创建指定数量的线程。\
+I am aware that the `-t` option has a behavior where it automatically reduces the number of threads when the input file is very small. This is an intentional feature of gatb-core, but it may still cause the program to create fewer threads than you specified.
 ## Description
 
 Error correction is the canonical first step in long-read sequencing data analysis. Nanopore R10 reads have error rates below 2\%. we introduce DeChat, a novel approach specifically designed for Nanopore R10 reads.DeChat enables repeat- and haplotype-aware error correction, leveraging the strengths of both de Bruijn graphs and variant-aware multiple sequence alignment to create a synergistic approach. This approach avoids read overcorrection, ensuring that variants in repeats and haplotypes are preserved while sequencing errors are accurately corrected.
