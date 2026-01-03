@@ -22,8 +22,8 @@ I adjusted the third-party library in this fork and added `#include <cstdint>` t
 我在本分叉中引入了 SIMDe 兼容层，使 DeChat 能够在 aarch64 Linux 设备上完成编译并运行。但由于缺乏足够的样本验证，我无法保证在 aarch64 平台上的运行结果与其他平台完全一致或其结果准确性。\
 I introduced SIMDe (SIMD everywhere) compatibility in this fork so that DeChat can be built and run on aarch64 Linux devices. However, due to limited samples, I cannot guarantee that results on aarch64 are fully identical to those on other platforms or that the output accuracy is fully verified.
 
-此外，我对本分叉的可用构建依赖版本范围进行了验证；请以 compilation.yaml 中记录的依赖与版本约束为准。\
-In addition, I validated the workable dependency/version range for building this fork; please refer to compilation.yaml for the authoritative dependency list and version constraints.
+我对本分叉的可用构建依赖版本范围进行了验证；请以 compilation.yaml 中记录的依赖与版本约束为准。\
+I validated the workable dependency/version range for building this fork; please refer to compilation.yaml for the authoritative dependency list and version constraints.
 
 我已知该项目仍存在一个 bug：其最大只能使用约 65 线程，但我没弄明白该怎么修复。\
 I am aware of an existing bug that the project supports around 65 threads at most, but I have not understood how to fix it yet.
